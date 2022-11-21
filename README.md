@@ -5,6 +5,6 @@ npm install
 
 Then, in order to run the app, execute:
 ```shell
-node server.js
+npm start
 ```
 
