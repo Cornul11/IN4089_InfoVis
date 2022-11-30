@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask
+from flask import Flask, g
 
 from aoe.data import load_data
 
@@ -8,7 +8,7 @@ from aoe.data import load_data
 def create_app():
     app = Flask(__name__)
 
-    data = load_data()
+    matches, players = load_data()
 
     # ensure the instance folder exists
     try:
@@ -18,6 +18,6 @@ def create_app():
 
     @app.route("/")
     def hello_world():
-        return "<p>Hello, World!</p>"
+        return "<p>Hello, World!</p>" + str(matches['patch'].unique())
 
     return app
