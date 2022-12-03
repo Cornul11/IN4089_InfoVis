@@ -1,44 +1,54 @@
-import * as d3 from "https://cdn.skypack.dev/d3@7";
-
-const dataset = async function getData() {
-    return await d3.csv("data/Portuguese.csv");
-}
-
 async function drawChart() {
-    const data = await dataset();
-    console.log(data);
-    const svgWidth = 500;
-    const svgHeight = 500;
-
-    let svg = d3.select("svg");
-
-    svg
-        .attr("width", svgWidth)
-        .attr("height", svgHeight);
-
-    let radius = Math.min(svgWidth, svgHeight) / 2,
-        g = svg.append("g").attr("transform", "translate(" + svgWidth / 2 + ", " + svgWidth / 2 + ")");
-
-    let color = d3.scaleOrdinal(['#4daf4a', '#377eb8', '#ff7f00', '#984ea3', '#e41a1c']);
-
-    let pie = d3.pie();
-
-    let arc = d3.arc()
-        .innerRadius(0)
-        .outerRadius(radius);
-
-    let arcs = g.selectAll("arc")
-        .data(pie(data))
-        .enter()
-        .append("g")
-        .attr("class", "arc");
-
-    arcs.append("path")
-        .attr("fill", function (d) {
-            console.log(d);
-            return color(d.data.school);
+        // TODO: this is a test for the API
+        d3.json("http://localhost:5000/api/v1/match_elos").then( data => {
+                console.log(data[0]);
         })
-        .attr("d", arc);
+
+        // set the dimensions and margins of the graph
+        const margin = {top: 30, right: 30, bottom: 70, left: 60},
+        width = 460 - margin.left - margin.right,
+        height = 400 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        const svg = d3.select("#my_dataviz")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+        // Parse the Data
+        d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/7_OneCatOneNum_header.csv").then( function(data) {
+
+        // X axis
+        const x = d3.scaleBand()
+        .range([ 0, width ])
+        .domain(data.map(d => d.Country))
+        .padding(0.2);
+        svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("transform", "translate(-10,0)rotate(-45)")
+        .style("text-anchor", "end");
+
+        // Add Y axis
+        const y = d3.scaleLinear()
+        .domain([0, 13000])
+        .range([ height, 0]);
+        svg.append("g")
+        .call(d3.axisLeft(y));
+
+        // Bars
+        svg.selectAll("mybar")
+        .data(data)
+        .join("rect")
+        .attr("x", d => x(d.Country))
+        .attr("y", d => y(d.Value))
+        .attr("width", x.bandwidth())
+        .attr("height", d => height - y(d.Value))
+        .attr("fill", "#69b3a2")
+    })
 }
 
 drawChart();

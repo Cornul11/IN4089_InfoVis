@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 from aoe.data import load_data
 from aoe.data_extraction import elo_match_distribution, global_civ_stats
@@ -21,9 +21,12 @@ def create_app():
     def hello_world():
         return "<p>Hello, World!</p>" + str(matches['patch'].unique())
 
-    @app.route("/api/v1/match_elos")
+    @app.route("/api/v1/match_elos", methods=['GET'])
     def match_elo():
-        return elo_match_distribution(matches)
+        # TODO: figure out if we use the jsonify or flask-cors
+        response = jsonify(elo_match_distribution(matches))
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
     @app.route("/api/v1/global_civ_stats", methods=['GET'])
     def g_civ_stats():
