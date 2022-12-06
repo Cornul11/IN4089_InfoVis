@@ -1,8 +1,8 @@
 async function drawEloMatch() {
     // set the dimensions and margins of the graph
     const margin = {top: 10, right: 30, bottom: 30, left: 40},
-        width = 460 - margin.left - margin.right,
-        height = 400 - margin.top - margin.bottom;
+        width = 600 - margin.left - margin.right,
+        height = 600 - margin.top - margin.bottom;
 
     // append the svg object to the body of the page
     const svg = d3.select("#eloPerMatch")
@@ -22,14 +22,15 @@ async function drawEloMatch() {
             .attr("transform", `translate(0, ${height})`)
             .call(d3.axisBottom(x));
         // set the parameters for the histogram
-        const histogram = d3.layout.histogram()
+        const histogram = d3.histogram()
             .value(function (d) {
-                return d.average_rating;
+                return d.frequency;  // TODO: HERE!!
             })   // I need to give the vector of value
             .domain(x.domain())  // then the domain of the graphic
             .thresholds(x.ticks(data.length / 100)); // then the numbers of bins
         // And apply this function to data to get the bins
-        const bins = histogram(data.average_rating);
+        const bins = histogram(data);
+        console.log(bins)
 
         // Y axis: scale and draw:
         const y = d3.scaleLinear().range([height, 0]);

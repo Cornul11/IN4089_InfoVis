@@ -3,9 +3,19 @@ import pandas as pd
 
 def elo_match_distribution(matches: pd.DataFrame) -> dict:
     average_rating = matches['average_rating']
+
+    s = pd.cut(average_rating, bins=10).value_counts().rename("frequency").to_frame()
+    s.reset_index(inplace=True)
+    s = s.rename(columns={'index': 'range'}).sort_values(by='range').sort_values(by="range")#.set_index("range")
+    print(s)
+    print(s.to_dict("records"))
+    print("**", type(s))
+
+
+
     histogram = average_rating.value_counts().rename("frequency").to_frame()
     histogram.reset_index(inplace=True)
-    histogram = histogram.rename(columns={'index': 'average_rating'})
+    histogram = histogram.rename(columns={'index': 'average_rating'}).sort_values(by="average_rating")
     return histogram.to_dict("records")
 
 
