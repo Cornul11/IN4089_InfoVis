@@ -2,7 +2,7 @@ async function drawEloMatch() {
 
     // set the dimensions and margins of the graph
     const margin = {top: 30, right: 30, bottom: 70, left: 60},
-        width = 600 - margin.left - margin.right,
+        width = 800 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
 
     const svg = d3.select("#eloPerMatch")
@@ -28,30 +28,35 @@ async function drawEloMatch() {
         svg.append("g")
             .call(d3.axisLeft(y));
 
+        svg.selectAll(".histogram")
+            .data(data)
+            .enter()
+            .append("rect")
+            .attr("x", function (d) {
+                return x(d.range - 57)
+            })
+            .attr("width", width / 59)
+            .attr("y", function (d) {
+                return y(d.frequency)
+            })
+            .attr("height", function (d) {
+                return height - y(d.frequency)
+            })
+            .attr("fill", "#69b3a2")
+
         svg.append("path")
             .datum(data)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
             .attr("stroke-width", 1.5)
             .attr("d", d3.line()
-                .x(function(d) { return x(d.range) })
-                .y(function(d) { return y(d.frequency) })
+                .x(function (d) {
+                    return x(d.range)
+                })
+                .y(function (d) {
+                    return y(d.frequency)
+                })
             )
-        // append the bar rectangles to the svg element
-    //     svg.data(data)
-    //         .enter()
-    //         .append("rect")
-    //         .attr("x", 1)
-    //         .attr("transform", function (d) {
-    //             return `translate(${x(d.range)} , ${y(d.frequency)})`
-    //         })
-    //         .attr("width", function (d) {
-    //             return x(d.frequency) - x(d.range) - 1
-    //         })
-    //         .attr("height", function (d) {
-    //             return height - y(d.frequency);
-    //         })
-    //         .style("fill", "#69b3a2")
     });
 
 }
