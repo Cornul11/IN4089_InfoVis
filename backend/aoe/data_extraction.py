@@ -3,20 +3,16 @@ import pandas as pd
 
 def elo_match_distribution(matches: pd.DataFrame) -> dict:
     average_rating = matches['average_rating']
+    new_entry = pd.Series([0])
+    average_rating = pd.concat([average_rating, new_entry], ignore_index=True)
 
-    s = pd.cut(average_rating, bins=10).value_counts().rename("frequency").to_frame()
+    s = pd.cut(average_rating, bins=54).value_counts().rename("frequency").to_frame()
     s.reset_index(inplace=True)
-    s = s.rename(columns={'index': 'range'}).sort_values(by='range').sort_values(by="range")#.set_index("range")
-    print(s)
-    print(s.to_dict("records"))
-    print("**", type(s))
+    s = s.rename(columns={'index': 'range'}).sort_values(by='range').sort_values(by="range")
+    s['range'] = s['range'].apply(lambda x: x.right)
+    s.iloc[0, 1] -= 1
 
-
-
-    histogram = average_rating.value_counts().rename("frequency").to_frame()
-    histogram.reset_index(inplace=True)
-    histogram = histogram.rename(columns={'index': 'average_rating'}).sort_values(by="average_rating")
-    return histogram.to_dict("records")
+    return s.to_dict("records")
 
 
 def global_civ_stats(players_m: pd.DataFrame, elo_s: int, elo_e: int) -> dict:
