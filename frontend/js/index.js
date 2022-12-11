@@ -1,3 +1,4 @@
+
 async function drawEloMatch() {
 
     // set the dimensions and margins of the graph
@@ -20,13 +21,33 @@ async function drawEloMatch() {
 
         svg.append("g")
             .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(x))
-        ;
+            .call(d3.axisBottom(x));
+
         const y = d3.scaleLinear()
             .domain([0, d3.max(data, d => d.frequency)]).range([height, 0]);
 
         svg.append("g")
             .call(d3.axisLeft(y));
+
+        const brush = d3.brushX()
+	    .extent([[1, 0.5], [width, height - 1]]) 
+	    .on("brush", brushed)
+	    .on("end", brushFinished);
+
+	const gb = svg.append("g")
+	    .call(brush);
+
+        function brushed({selection}) {
+	    if (selection) {
+                console.log("selected"); 
+            }
+	}
+
+	function brushFinished({selection}) {
+            if (!selection) {
+               console.log("cleared");
+	    }
+	}
 
         svg.selectAll(".histogram")
             .data(data)
