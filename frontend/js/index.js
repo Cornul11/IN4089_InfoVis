@@ -29,6 +29,37 @@ async function drawEloMatch() {
         svg.append("g")
             .call(d3.axisLeft(y));
 
+	// mouseover capabilities
+	const tooltip = d3.select("#eloPerMatch")
+            .append("div")
+   	    .style("opacity",0)
+	    .style("display", "inline")
+	    .style("position", "fixed")
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "1px")
+            .style("border-radius", "4px")
+            .style("padding", "10px")
+
+        const mouseover = function(event, d) {
+            console.log("lmao"); 	
+	    console.log(event.y-30);
+            tooltip.html(""+d.frequency)
+                   .style("opacity", 1)
+        }
+
+        const mousemove = function(event, d) {
+            tooltip.style("cursor", "pointer") 
+                   .style("left", (event.x) + "px")
+                   .style("top", (event.y) + "px")
+	} 
+
+        const mouseleave = function(event, d) {
+            tooltip.style("opacity", 0)
+        }
+
+        // brush to select interval starts here
         const brush = d3.brushX()
 	    .extent([[1, 0.5], [width, height - 1]]) 
 	    .on("brush", brushed)
@@ -48,11 +79,15 @@ async function drawEloMatch() {
                console.log("cleared");
 	    }
 	}
-
+        // end of brush
+	
+	// create graph
         svg.selectAll(".histogram")
             .data(data)
             .enter()
             .append("rect")
+	    .on("mouseover", mouseover)
+	    .on("mouseleave", mouseleave)
             .attr("x", function (d) {
                 return x(d.range - 57)
             })
@@ -64,6 +99,7 @@ async function drawEloMatch() {
                 return height - y(d.frequency)
             })
             .attr("fill", "#69b3a2")
+	    .on("mousemove", mousemove)
 
         svg.append("path")
             .datum(data)
