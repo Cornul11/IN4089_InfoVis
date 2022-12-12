@@ -3,7 +3,7 @@ import os
 from flask import Flask, request, jsonify
 
 from aoe.data import load_data
-from aoe.data_extraction import elo_match_distribution, global_civ_stats
+from aoe.data_extraction import elo_match_distribution, global_civ_stats, game_type
 
 
 def create_app():
@@ -35,5 +35,13 @@ def create_app():
             elo_end = int(request.args.get('elo_e'))
             test = global_civ_stats(players_m, elo_start, elo_end)
         return test
+
+    @app.route("/api/v1/game_type_stats", methods=['GET'])
+    def game_types_stats():
+        if request.method == 'GET':
+            response = jsonify(game_type(matches))
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+
 
     return app

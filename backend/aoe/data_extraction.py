@@ -8,7 +8,7 @@ def elo_match_distribution(matches: pd.DataFrame) -> dict:
 
     s = pd.cut(average_rating, bins=54).value_counts().rename("frequency").to_frame()
     s.reset_index(inplace=True)
-    s = s.rename(columns={'index': 'range'}).sort_values(by='range').sort_values(by="range")
+    s = s.rename(columns={'index': 'range'}).sort_values(by='range')
     s['range'] = s['range'].apply(lambda x: x.right)
     s.iloc[0, 1] -= 1
 
@@ -30,6 +30,18 @@ def global_civ_stats(players_m: pd.DataFrame, elo_s: int, elo_e: int) -> dict:
         }
         res_dict[civ] = civ_entry
     return res_dict
+
+
+def game_type(matches: pd.DataFrame) -> dict:
+    df = matches['ladder']
+    s = df.value_counts().rename("amount").to_frame()
+    s.reset_index(inplace=True)
+    s = s.rename(columns={'index': 'type'}).sort_values(by='amount')
+    res = {}
+    for _, row in s.iterrows():
+        res[row['type']] = row['amount']
+        # print(row)
+    return res
 
 
 '''
