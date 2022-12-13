@@ -40,7 +40,6 @@ def game_type(matches: pd.DataFrame) -> dict:
     res = {}
     for _, row in s.iterrows():
         res[row['type']] = row['amount']
-        # print(row)
     return res
 
 

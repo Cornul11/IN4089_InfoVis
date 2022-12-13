@@ -136,7 +136,7 @@ async function pieChart() {
         .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
     d3.json("http://localhost:5000/api/v1/game_type_stats").then(data => {
-        // set the color scale
+        // TODO: find a way to change colors!!
         const color = d3.scaleOrdinal()
             .domain(["TEAM", "1V1"])
             .range(d3.schemeDark2);
@@ -146,14 +146,12 @@ async function pieChart() {
             .value(function (d) {
                 return d[1];  // Amount of games in type
             })
-            .sort(function (a, b) {
-                return d3.ascending(a.key, b.key);
-            }) // This make sure that group order remains the same in the pie chart
+            .sort(d3.descending)
 
         const data_ready = pie(Object.entries(data))
 
         // map to data
-        svg.selectAll("path")
+        const test = svg.selectAll("path")
             .data(data_ready)
             // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
             .join('path')
