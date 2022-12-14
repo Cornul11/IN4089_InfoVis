@@ -11,7 +11,7 @@ async function updatePieChart(elo_start, elo_end) {
     d3.json(api_call).then(data => {
         pie_chart.updateChart(data)
     });
-}u
+}
 
 async function drawChart() {
     // set the dimensions and margins of the graph
