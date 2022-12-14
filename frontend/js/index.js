@@ -6,8 +6,6 @@ async function updatePieChart(elo_start, elo_end) {
     if (elo_start != null && elo_end != null) {
         api_call += `?elo_s=${elo_start}&elo_e=${elo_end}`;
     }
-    console.log("******test");
-    console.log(api_call);
     d3.json(api_call).then(data => {
         pie_chart.updateChart(data)
     });

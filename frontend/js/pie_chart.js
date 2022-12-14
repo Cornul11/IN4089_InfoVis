@@ -21,11 +21,6 @@ class PieChart {
     }
 
     updateChart(data) {
-        // TODO: find a way to change colors!!
-        const color = d3.scaleOrdinal()
-            .domain(["TEAM", "1V1"])
-            .range(d3.schemeDark2);
-
         // Compute the position of each group on the pie:
         const pie = d3.pie()
             .value(function (d) {
@@ -44,8 +39,13 @@ class PieChart {
                 .innerRadius(0)  // This makes the donut hole, 0 is a pie chart
                 .outerRadius(this.radius)
             )
-            .attr('fill', function (d) {
-                return (color(d.data[0]))  // Uses the "color" function created above
+            .attr('fill', function (d) {  // Hardcoded colors
+                if (d.data[0] === "RM_1v1") {
+                    return "#21ad45"
+                }
+                else if (d.data[0] === "RM_TEAM") {
+                    return "#ea541c"
+                }
             })
             .attr("stroke", "white")
             .style("stroke-width", "2px")
