@@ -16,6 +16,17 @@ def elo_match_distribution(matches: pd.DataFrame) -> dict:
 
 
 def global_civ_stats(players_m: pd.DataFrame, elo_s: int, elo_e: int) -> dict:
+    '''
+    {Inca: {
+            win_rate: 11
+            popularity: 100
+
+            },
+     Aztec: {
+            ...
+            }
+    }
+    '''
     # remove entries from df that aren't in the elo interval
     df = players_m[players_m['rating'].between(elo_s, elo_e)]
     civs = df['civ'].unique()
@@ -26,14 +37,15 @@ def global_civ_stats(players_m: pd.DataFrame, elo_s: int, elo_e: int) -> dict:
         win_inst = len(df_civ.loc[df_civ['winner']])
         civ_entry = {
             "popularity": total_inst,
-            "win_rate": (win_inst/total_inst)*100
+            "win_rate": (win_inst / total_inst) * 100
         }
         res_dict[civ] = civ_entry
     return res_dict
 
 
-def game_type(matches: pd.DataFrame) -> dict:
-    df = matches['ladder']
+def game_type(matches: pd.DataFrame, elo_s=0, elo_e=4000) -> dict:
+    df = matches[matches['average_rating'].between(elo_s, elo_e)]
+    df = df['ladder']
     s = df.value_counts().rename("amount").to_frame()
     s.reset_index(inplace=True)
     s = s.rename(columns={'index': 'type'}).sort_values(by='amount')
@@ -41,16 +53,3 @@ def game_type(matches: pd.DataFrame) -> dict:
     for _, row in s.iterrows():
         res[row['type']] = row['amount']
     return res
-
-
-'''
-{Inca: {
-        win_rate: 11
-        popularity: 100
-        
-        },
- Aztec: {
-        ...
-        }
-}
-'''

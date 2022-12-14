@@ -1,172 +1,17 @@
 const debug = false
 
-async function drawEloMatch() {
-
-    // set the dimensions and margins of the graph
-    const margin = {top: 30, right: 30, bottom: 70, left: 60},
-        width = 800 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
-
-    const svg = d3.select("#eloPerMatch")
-        .append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform",
-            `translate(${margin.left},${margin.top})`);
-
-    d3.json("http://localhost:5000/api/v1/match_elos").then(data => {
-        const x = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.range)])
-            .range([0, width]);
-
-        svg.append("g")
-            .attr("transform", `translate(0, ${height})`)
-            .call(d3.axisBottom(x));
-
-        const y = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.frequency)]).range([height, 0]);
-
-        svg.append("g")
-            .call(d3.axisLeft(y));
-
-        // mouseover capabilities
-        const tooltip = d3.select("#eloPerMatch")
-            .append("div")
-            .style("opacity", 0)
-            .style("display", "inline")
-            .style("position", "fixed")
-            .attr("class", "tooltip")
-            .style("background-color", "white")
-            .style("border", "solid")
-            .style("border-width", "1px")
-            .style("border-radius", "4px")
-            .style("padding", "10px")
-
-        const mouseover = function (event, d) {
-            tooltip.html("" + d.frequency)
-                .style("opacity", 1)
-        }
-
-        const mousemove = function (event, d) {
-            tooltip.style("cursor", "pointer")
-                .style("left", (event.x) + "px")
-                .style("top", (event.y - 44.75) + "px")  // TODO: Don't know how to get the tooltip height
-        }
-
-        const mouseleave = function (event, d) {
-            tooltip.style("opacity", 0)
-        }
-
-        // brush to select interval starts here
-        const brush = d3.brushX()
-            .extent([[1, 0.5], [width, height - 1]])
-            .on("brush", brushed)
-            .on("end", brushFinished);
-
-        const gb = svg.append("g")
-            .call(brush);
-
-        function brushed({selection}) {
-            if (selection) {
-                console.log("selected");
-            }
-        }
-
-        function brushFinished({selection}) {
-            if (!selection) {
-                console.log("cleared");
-            }
-        }
-
-        // end of brush
-
-        // create graph
-        svg.selectAll(".histogram")
-            .data(data)
-            .enter()
-            .append("rect")
-            .on("mouseover", mouseover)
-            .on("mouseleave", mouseleave)
-            .attr("x", function (d) {
-                return x(d.range - 57)
-            })
-            .attr("width", width / 59)
-            .attr("y", function (d) {
-                return y(d.frequency)
-            })
-            .attr("height", function (d) {
-                return height - y(d.frequency)
-            })
-            .attr("fill", "#69b3a2")
-            .on("mousemove", mousemove)
-
-        if (debug) {
-            svg.append("path")
-                .datum(data)
-                .attr("fill", "none")
-                .attr("stroke", "steelblue")
-                .attr("stroke-width", 1.5)
-                .attr("d", d3.line()
-                    .x(function (d) {
-                        return x(d.range)
-                    })
-                    .y(function (d) {
-                        return y(d.frequency)
-                    })
-                )
-        }
+async function updatePieChart(elo_start, elo_end) {
+    // api call goes here
+    let api_call = "http://localhost:5000/api/v1/game_type_stats";
+    if (elo_start != null && elo_end != null) {
+        api_call += `?elo_s=${elo_start}&elo_e=${elo_end}`;
+    }
+    console.log("******test");
+    console.log(api_call);
+    d3.json(api_call).then(data => {
+        pie_chart.updateChart(data)
     });
-}
-
-async function pieChart() {
-    // set the dimensions and margins of the graph
-    const width = 500,
-        height = 500,
-        margin = 40;
-
-    // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
-    const radius = Math.min(width, height) / 2 - margin;
-
-    const svg = d3.select("#pie_chart")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .append("g")
-        .attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-    d3.json("http://localhost:5000/api/v1/game_type_stats").then(data => {
-        // TODO: find a way to change colors!!
-        const color = d3.scaleOrdinal()
-            .domain(["TEAM", "1V1"])
-            .range(d3.schemeDark2);
-
-        // Compute the position of each group on the pie:
-        const pie = d3.pie()
-            .value(function (d) {
-                return d[1];  // Amount of games in type
-            })
-            .sort(d3.descending)
-
-        const data_ready = pie(Object.entries(data))
-
-        // map to data
-        const test = svg.selectAll("path")
-            .data(data_ready)
-            // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
-            .join('path')
-            .attr('d', d3.arc()
-                .innerRadius(0)  // This makes the donut hole, 0 is a pie chart
-                .outerRadius(radius)
-            )
-            .attr('fill', function (d) {
-                return (color(d.data[0]))  // Uses the "color" function created above
-            })
-            .attr("stroke", "white")
-            .style("stroke-width", "2px")
-            .style("opacity", 1)
-    });
-}
+}u
 
 async function drawChart() {
     // set the dimensions and margins of the graph
@@ -216,6 +61,7 @@ async function drawChart() {
     })
 }
 
-drawEloMatch();
-pieChart()
+let match = new EloMatch(updatePieChart)
+let pie_chart = new PieChart()
+//pieChart()
 drawChart();

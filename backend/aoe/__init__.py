@@ -39,7 +39,12 @@ def create_app():
     @app.route("/api/v1/game_type_stats", methods=['GET'])
     def game_types_stats():
         if request.method == 'GET':
-            response = jsonify(game_type(matches))
+            elo_start = request.args.get('elo_s')
+            elo_end = request.args.get('elo_e')
+            if not elo_start or not elo_end:
+                response = jsonify(game_type(matches))
+            else:
+                response = jsonify(game_type(matches, int(elo_start), int(elo_end)))
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
 
