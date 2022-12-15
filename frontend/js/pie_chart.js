@@ -26,7 +26,7 @@ class PieChart {
             .value(function (d) {
                 return d[1];  // Amount of games in type
             })
-            .sort(d3.descending)
+            .sort(d3.ascending)
 
         const data_ready = pie(Object.entries(data))
 
@@ -50,5 +50,18 @@ class PieChart {
             .attr("stroke", "white")
             .style("stroke-width", "2px")
             .style("opacity", 1)
+
+        const arcGenerator = d3.arc()
+            .innerRadius(0)
+            .outerRadius(this.radius)
+
+        d3.selectAll('text').remove()  // Clear the old text
+        this.svg.selectAll('mySlices')
+            .data(data_ready)
+            .join('text')
+            .text(function(d) { return d.data[0]})
+            .attr("transform", function(d) { return `translate(${arcGenerator.centroid(d)})`})
+            .style("text-anchor", "middle")
+            .style("font-size", 17)
     }
 }
