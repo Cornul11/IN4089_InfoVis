@@ -29,11 +29,11 @@ class PieChart {
             .sort(d3.ascending)
 
         const data_ready = pie(Object.entries(data))
-	let total = 0;
-	if (data["RM_1v1"])
-		total += data["RM_1v1"];
-	if (data["RM_TEAM"])
-		total += data["RM_TEAM"];
+        let total = 0;
+        if (data["RM_1v1"])
+            total += data["RM_1v1"];
+        if (data["RM_TEAM"])
+            total += data["RM_TEAM"];
         // map to data
         this.svg.selectAll("path")
             .data(data_ready)
@@ -46,8 +46,7 @@ class PieChart {
             .attr('fill', function (d) {  // Hardcoded colors
                 if (d.data[0] === "RM_1v1") {
                     return "#21ad45"
-                }
-                else if (d.data[0] === "RM_TEAM") {
+                } else if (d.data[0] === "RM_TEAM") {
                     return "#ea541c"
                 }
             })
@@ -63,13 +62,15 @@ class PieChart {
         this.svg.selectAll('mySlices')
             .data(data_ready)
             .join('text')
-            .text(function(d) {
-	        if(d.data[0] == "RM_1v1")
-		    return "1v1 Mode (" + Math.round(d.value/total*100) + "%)";
-		else
-		    return "Team Mode (" + Math.round(d.value/total*100) + "%)";
-	    })
-            .attr("transform", function(d) { return `translate(${arcGenerator.centroid(d)})`})
+            .text(function (d) {
+                if (d.data[0] === "RM_1v1")
+                    return "1v1 Mode (" + Math.round(d.value / total * 100) + "%)";
+                else
+                    return "Team Mode (" + Math.round(d.value / total * 100) + "%)";
+            })
+            .attr("transform", function (d) {
+                return `translate(${arcGenerator.centroid(d)})`
+            })
             .style("text-anchor", "middle")
             .style("font-size", 17)
     }
