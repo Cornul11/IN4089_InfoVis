@@ -29,7 +29,11 @@ class PieChart {
             .sort(d3.ascending)
 
         const data_ready = pie(Object.entries(data))
-
+	let total = 0;
+	if (data["RM_1v1"])
+		total += data["RM_1v1"];
+	if (data["RM_TEAM"])
+		total += data["RM_TEAM"];
         // map to data
         this.svg.selectAll("path")
             .data(data_ready)
@@ -55,11 +59,16 @@ class PieChart {
             .innerRadius(0)
             .outerRadius(this.radius)
 
-        d3.selectAll('text').remove()  // Clear the old text
+        d3.select('#pie_chart').selectAll('text').remove()  // Clear the old text
         this.svg.selectAll('mySlices')
             .data(data_ready)
             .join('text')
-            .text(function(d) { return d.data[0]})
+            .text(function(d) {
+	        if(d.data[0] == "RM_1v1")
+		    return "1v1 Mode (" + Math.round(d.value/total*100) + "%)";
+		else
+		    return "Team Mode (" + Math.round(d.value/total*100) + "%)";
+	    })
             .attr("transform", function(d) { return `translate(${arcGenerator.centroid(d)})`})
             .style("text-anchor", "middle")
             .style("font-size", 17)
