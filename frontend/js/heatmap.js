@@ -43,7 +43,7 @@ class Heatmap {
 // Build color scale
         const myColor = d3.scaleLinear()
             .range(["white", "#69b3a2"])
-            .domain([0, 0.6])
+            .domain([0.4, 0.6])
 
 //Read the data
         d3.csv("http://localhost:5000/api/v1/heatmap_civs").then(function (data) {
