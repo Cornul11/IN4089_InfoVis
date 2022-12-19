@@ -11,6 +11,7 @@ async function updatePieChart(elo_start, elo_end) {
     });
 }
 
+// Kept for reference
 async function drawChart() {
     // set the dimensions and margins of the graph
     const margin = {top: 30, right: 30, bottom: 70, left: 60},
@@ -61,5 +62,6 @@ async function drawChart() {
 
 let match = new EloMatch(updatePieChart)
 let pie_chart = new PieChart()
+let heatmap = new Heatmap()
 //pieChart()
 drawChart();

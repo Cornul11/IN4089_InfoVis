@@ -53,3 +53,26 @@ def game_type(matches: pd.DataFrame, elo_s=0, elo_e=4000) -> dict:
     for _, row in s.iterrows():
         res[row['type']] = row['amount']
     return res
+
+def heatmap_data(matches: pd.DataFrame, players: pd.DataFrame, elo_s: int = None, elo_e: int = None):
+    if elo_s is not None and elo_e is not None:
+        token = matches[matches['average_rating'].between(elo_s, elo_e)]['token']
+    else:
+        token = matches['token']
+    renames = {
+        "token": "opponent",
+        "civ": "opponent_civ",
+    }
+    opponents = players[["match", "token", "civ"]].rename(columns=renames)
+    filtered_players = players[players['match'].isin(token)]
+    vs_df = pd.merge(filtered_players, opponents, left_on="match", right_on="match").rename(columns={"token": "player"})
+    vs_df = vs_df[vs_df["player"] != vs_df["opponent"]]
+    wins_r = vs_df.pivot_table(values="winner", index="civ", columns="opponent_civ").to_dict()
+
+    # csv_conversion TODO: this is really slow apparently
+    string = "civ,ociv,val"
+    for civ, content in wins_r.items():
+        for ociv, val in content.items():
+            string += '\n' + civ + "," + ociv + "," + str(val)
+
+    return string

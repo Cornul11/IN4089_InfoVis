@@ -1,9 +1,9 @@
 import os
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 
 from aoe.data import load_data
-from aoe.data_extraction import elo_match_distribution, global_civ_stats, game_type
+from aoe.data_extraction import elo_match_distribution, global_civ_stats, game_type, heatmap_data
 
 
 def create_app():
@@ -48,5 +48,19 @@ def create_app():
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
 
+    @app.route("/api/v1/heatmap_civs", methods=['GET'])
+    def heatmap_civs():
+        if request.method == 'GET':
+            elo_start = request.args.get('elo_s')
+            elo_end = request.args.get('elo_e')
+
+            if not elo_start or not elo_end:
+                response = make_response(heatmap_data(matches, players_m))
+            else:
+                response = make_response(heatmap_data(matches, players_m, int(elo_start, int(elo_end))))
+            response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+            response.headers["Content-Type"] = "text/csv"
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
 
     return app
