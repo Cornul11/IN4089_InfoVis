@@ -15,7 +15,7 @@ class Heatmap {
 // Labels of row and columns
         const civilizations = ["Aztecs", "Berbers", "Britons", "Bulgarians", "Burmese", "Byzantines", "Celts",
             "Chinese", "Cumans", "Ethiopians", "Franks", "Goths", "Huns", "Incas", "Indians", "Italians", "Japanese",
-            "Khmer", "Koreans", "    Lithuanians", "Magyars", "Malay", "Malians", "Mayans", "Mongols", "Persians",
+            "Khmer", "Koreans", "Lithuanians", "Magyars", "Malay", "Malians", "Mayans", "Mongols", "Persians",
             "Portuguese", "Saracens", "Slavs", "Spanish", "Tatars", "Teutons", "Turks", "Vietnamese", "Vikings"]
 
 // Build X scales and axis:
