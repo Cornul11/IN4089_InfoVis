@@ -1,4 +1,8 @@
-const debug = false
+// TODO: some of the logic is the same in every plot, it might be simplified later to reduce code
+async function updateAllCharts(elo_start, elo_end) {
+    updatePieChart(elo_start, elo_end)
+    updateHeatmap(elo_start, elo_end)
+}
 
 async function updatePieChart(elo_start, elo_end) {
     // api call goes here
@@ -8,6 +12,17 @@ async function updatePieChart(elo_start, elo_end) {
     }
     d3.json(api_call).then(data => {
         pie_chart.updateChart(data)
+    });
+}
+
+async function updateHeatmap(elo_start, elo_end) {
+    // api call goes here
+    let api_call = "http://localhost:5000/api/v1/heatmap_civs";
+    if (elo_start != null && elo_end != null) {
+        api_call += `?elo_s=${elo_start}&elo_e=${elo_end}`;
+    }
+    d3.csv(api_call).then(data => {
+        heatmap.updateChart(data)
     });
 }
 
@@ -60,7 +75,7 @@ async function drawChart() {
     })
 }
 
-let match = new EloMatch(updatePieChart)
+let match = new EloMatch(updateAllCharts)
 let pie_chart = new PieChart()
 let heatmap = new Heatmap()
 //pieChart()

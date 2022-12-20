@@ -53,11 +53,10 @@ def create_app():
         if request.method == 'GET':
             elo_start = request.args.get('elo_s')
             elo_end = request.args.get('elo_e')
-
             if not elo_start or not elo_end:
                 response = make_response(heatmap_data(matches, players_m))
             else:
-                response = make_response(heatmap_data(matches, players_m, int(elo_start, int(elo_end))))
+                response = make_response(heatmap_data(matches, players_m, int(elo_start), int(elo_end)))
             response.headers["Content-Disposition"] = "attachment; filename=export.csv"
             response.headers["Content-Type"] = "text/csv"
             response.headers.add('Access-Control-Allow-Origin', '*')

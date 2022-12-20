@@ -54,6 +54,7 @@ def game_type(matches: pd.DataFrame, elo_s=0, elo_e=4000) -> dict:
         res[row['type']] = row['amount']
     return res
 
+# TODO: this need a full overhaul, it's incredibly slow
 def heatmap_data(matches: pd.DataFrame, players: pd.DataFrame, elo_s: int = None, elo_e: int = None):
     if elo_s is not None and elo_e is not None:
         token = matches[matches['average_rating'].between(elo_s, elo_e)]['token']

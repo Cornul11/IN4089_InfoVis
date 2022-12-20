@@ -1,5 +1,5 @@
 class EloMatch {
-    constructor(updatePieChart) {
+    constructor(updateAllCharts) {
         const margin = {top: 30, right: 30, bottom: 70, left: 60},
             width = 800 - margin.left - margin.right,
             height = 600 - margin.top - margin.bottom;
@@ -71,10 +71,10 @@ class EloMatch {
             function brushFinished({selection}) {
                 if (!selection) {
                     console.log("cleared");
-                    updatePieChart(null, null);
+                    updateAllCharts(null, null);
                 } else {
                     const selection_x = [parseInt(x.invert(selection[0])), parseInt(x.invert(selection[1]))];
-                    updatePieChart(selection_x[0], selection_x[1]);
+                    updateAllCharts(selection_x[0], selection_x[1]);
                 }
             }
 
