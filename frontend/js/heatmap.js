@@ -19,9 +19,9 @@ class Heatmap {
             "Portuguese", "Saracens", "Slavs", "Spanish", "Tatars", "Teutons", "Turks", "Vietnamese", "Vikings"]
 
         //Read the data
-        d3.csv("http://localhost:5000/api/v1/heatmap_civs").then(data => {
-            this.updateChart(data)
-        });
+        // d3.csv("http://localhost:5000/api/v1/heatmap_civs").then(data => {
+        //     this.updateChart(data)
+        // });
     }
 
     updateChart(data) {

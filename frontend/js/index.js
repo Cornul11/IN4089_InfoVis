@@ -21,9 +21,9 @@ async function updateHeatmap(elo_start, elo_end) {
     if (elo_start != null && elo_end != null) {
         api_call += `?elo_s=${elo_start}&elo_e=${elo_end}`;
     }
-    d3.csv(api_call).then(data => {
-        heatmap.updateChart(data)
-    });
+    // d3.csv(api_call).then(data => {
+    //     heatmap.updateChart(data)
+    // });
 }
 
 // Kept for reference
@@ -74,6 +74,10 @@ async function drawChart() {
             .attr("fill", "#69b3a2");
     })
 }
+// updates the image based on the dropdown menu selection
+$("#civ-names").change(function() {
+    $("#civ-img").attr("src", "static/img/" + $(this).val() + ".png");
+});
 
 let match = new EloMatch(updateAllCharts)
 let pie_chart = new PieChart()
