@@ -1,21 +1,9 @@
 class EloMatch {
-    constructor(updateAllCharts) {
-        const margin = {top: 30, right: 30, bottom: 70, left: 60},
-            width = 800 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
-
-        const svg = d3.select("#eloPerMatch")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform",
-                `translate(${margin.left},${margin.top})`);
-
-        d3.json("http://localhost:5000/api/v1/match_elos").then(data => {
+    draw_histogram(civilization, svg, margin, width, height) {
+        d3.json("http://localhost:5000/api/v1/match_elos?civilization=" + civilization).then(data => {
             const x = d3.scaleLinear()
                 .domain([0, d3.max(data, d => d.range)])
-                .range([0, width]);
+                .range([0, this.width]);
 
             svg.append("g")
                 .attr("transform", `translate(0, ${height})`)
@@ -99,5 +87,28 @@ class EloMatch {
                 .attr("fill", "#69b3a2")
                 .on("mousemove", mousemove)
         });
+    }
+
+    margin = {top: 30, right: 30, bottom: 70, left: 60};
+    width = 800 - this.margin.left - this.margin.right;
+    height = 600 - this.margin.top - this.margin.bottom;
+
+    svg = d3.select("#eloPerMatch")
+        .append("svg")
+        .attr("width", this.width + this.margin.left + this.margin.right)
+        .attr("height", this.height + this.margin.top + this.margin.bottom)
+        .append("g")
+        .attr("transform",
+            `translate(${this.margin.left},${this.margin.top})`);
+
+    constructor(updateAllCharts) {
+
+        this.draw_histogram("", this.svg, this.margin, this.width, this.height)
+
+    }
+
+    something(civilization) {
+        this.draw_histogram(civilization, this.svg, this.margin, this.width, this.height)
+
     }
 }

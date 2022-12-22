@@ -74,10 +74,20 @@ async function drawChart() {
             .attr("fill", "#69b3a2");
     })
 }
-// updates the image based on the dropdown menu selection
-$("#civ-names").change(function() {
-    $("#civ-img").attr("src", "static/img/" + $(this).val() + ".png");
+
+// updates the civilization image based on the dropdown menu selection
+$("#civ-names").change(function () {
+    $("#civ-img").attr("src", "static/img/civ/" + $(this).val() + ".png");
+    match.something($(this).val());
+    $("#civ-card-text").text($("#civ-names option:selected").text())
 });
+//updates the image of the map based on the dropdown menu selection
+$("#map-names").change(function () {
+    $("#map-img").attr("src", "static/img/map/" + $(this).val() + ".png");
+    match.something($(this).val());
+    $("#map-card-text").text($("#map-names option:selected").text())
+});
+
 
 let match = new EloMatch(updateAllCharts)
 let pie_chart = new PieChart()
