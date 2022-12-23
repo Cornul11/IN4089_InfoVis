@@ -83,11 +83,11 @@ function capitalizeFirstLetter(str) {
 function create_url() {
     const base_url = "http://localhost:5000/api/v1/match_elos";
     let url_suffix = "";
-    if (civ !== "None" && map !== "none") {
+    if (civ.toLowerCase() !== "none" && map.toLowerCase() !== "none") {
         url_suffix = `?map=${map}&civ=${civ}`
-    } else if (civ !== "None") {
+    } else if (civ.toLowerCase() !== "none") {
         url_suffix = `?civ=${civ}`
-    } else if (map !== "none") {
+    } else if (map.toLowerCase() !== "none") {
         url_suffix = `?map=${map}`
     }
     return base_url + url_suffix

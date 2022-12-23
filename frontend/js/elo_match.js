@@ -110,9 +110,13 @@ class EloMatch {
         d3.select('#eloPerMatch')
             .on('dataLoading', function () {
                 d3.select('#eloSpinner').style('display', 'block');
+                d3.select('#map-names').attr('disabled', true)
+                d3.select('#civ-names').attr('disabled', true)
             })
             .on('dataLoaded', function () {
                 d3.select('#eloSpinner').style('display', 'none');
+                d3.select('#map-names').attr('disabled', null)
+                d3.select('#civ-names').attr('disabled', null)
             });
         this.draw_histogram("http://localhost:5000/api/v1/match_elos", this.svg, this.margin, this.width, this.height)
     }
