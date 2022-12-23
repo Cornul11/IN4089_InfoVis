@@ -3,7 +3,7 @@ import pandas as pd
 from aoe.db import query_db
 
 
-def elo_match_distribution():
+def elo_match_distribution(map=None, civ=None):
     """
     Returns a list of dictionaries containing the frequency and range of ELO ratings for each bin
      in a histogram of ELO ratings for all matches.
@@ -11,14 +11,44 @@ def elo_match_distribution():
     :return: A list of dictionaries with keys 'frequency' and 'range', representing the frequency
      and range of ELO ratings for each bin, respectively.
     """
-    rows = query_db(
-        "select floor(average_rating/100.00) * 100 as bin_floor, \
-                     count(`index`) as count \
-              from matches \
-              group by 1 \
-              order by 1;"
-    )
-    results = [{"frequency": x[1], "range": x[0]} for x in rows if x[0] is not None]
+    if map and civ:
+        query_str = "SELECT FLOOR(matches.average_rating / 100) * 100 AS rating_range, \
+                            COUNT(*)                                  AS frequency \
+                     FROM matches \
+                              INNER JOIN players ON matches.token = players.match \
+                     WHERE players.civ = ? \
+                       AND matches.map = ? \
+                     GROUP BY rating_range \
+                     ORDER BY rating_range ASC;"
+        query_args = [civ, map]
+    elif civ:
+        query_str = "SELECT FLOOR(matches.average_rating / 100) * 100 AS rating_range, \
+                            COUNT(*)                                  AS frequency \
+                     FROM matches \
+                              INNER JOIN players ON matches.token = players.match \
+                     WHERE players.civ = ? \
+                     GROUP BY rating_range \
+                     ORDER BY rating_range ASC;"
+        query_args = [civ]
+    elif map:
+        query_str = "SELECT FLOOR(average_rating / 100.00) * 100 AS bin_floor, \
+                            COUNT(`index`)                       AS count \
+                     FROM matches \
+                     WHERE map IS ? \
+                     GROUP BY 1 \
+                     ORDER BY 1;"
+        query_args = [map]
+    else:
+        query_str = "SELECT FLOOR(average_rating / 100.00) * 100 AS bin_floor, \
+                            COUNT(`index`)                       AS count \
+                     FROM matches \
+                     GROUP BY 1 \
+                     ORDER BY 1;"
+        query_args = []
+
+    rows = query_db(query_str, query_args)
+
+    results = [{"frequency": x[1], "range": x[0]} for x in rows]
     return results
 
 

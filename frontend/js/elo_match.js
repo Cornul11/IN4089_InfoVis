@@ -1,6 +1,10 @@
 class EloMatch {
-    draw_histogram(civilization, svg, margin, width, height) {
-        d3.json("http://localhost:5000/api/v1/match_elos?civilization=" + civilization).then(data => {
+    draw_histogram(url, svg, margin, width, height) {
+        svg.selectAll("*").remove();
+        d3.select('#eloPerMatch').dispatch('dataLoading');
+        d3.json(url).then(data => {
+            d3.select('#eloPerMatch').dispatch('dataLoaded');
+
             const x = d3.scaleLinear()
                 .domain([0, d3.max(data, d => d.range)])
                 .range([0, this.width]);
@@ -101,14 +105,19 @@ class EloMatch {
         .attr("transform",
             `translate(${this.margin.left},${this.margin.top})`);
 
-    constructor(updateAllCharts) {
+    constructor() {
 
-        this.draw_histogram("", this.svg, this.margin, this.width, this.height)
-
+        d3.select('#eloPerMatch')
+            .on('dataLoading', function () {
+                d3.select('#eloSpinner').style('display', 'block');
+            })
+            .on('dataLoaded', function () {
+                d3.select('#eloSpinner').style('display', 'none');
+            });
+        this.draw_histogram("http://localhost:5000/api/v1/match_elos", this.svg, this.margin, this.width, this.height)
     }
 
-    something(civilization) {
-        this.draw_histogram(civilization, this.svg, this.margin, this.width, this.height)
-
+    redraw_histogram(url) {
+        this.draw_histogram(url, this.svg, this.margin, this.width, this.height)
     }
 }

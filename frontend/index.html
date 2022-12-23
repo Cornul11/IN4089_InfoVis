@@ -12,11 +12,11 @@
     <script src=https://d3js.org/d3.v7.min.js></script>
     <script type="module" src="js/index.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
 <div>
     <h2 class="text-center">Age of Empires matches visualization</h2>
-
     <div class="container">
         <div class="row mb-3">
             <div class="col-md-8 themed-grid-col">
@@ -122,7 +122,7 @@
                 <div class="row">
                     <div class="col-6">
                         <div class="card">
-                            <img id="civ-img" src="static/img/map/none.png" class="card-img-top float-start" alt="...">
+                            <img id="civ-img" src="static/img/civ/none.png" class="card-img-top float-start" alt="...">
                             <div class="card-body">
                                 <p class="card-text" id="civ-card-text">All civilizations</p>
                             </div>
@@ -140,10 +140,15 @@
             </div>
         </div>
     </div>
-    <div id="eloPerMatch"></div>
-    <div id="pie_chart" style="display: inline"></div>
-    <div id="heatmap" style="display: inline"></div>
-    <div id="my_dataviz" style="display: inline"></div>
+    <div id="eloPerMatch">
+        <div class="d-flex justify-content-center">
+            <div id="eloSpinner" class="spinner-border" role="status">
+            </div>
+        </div>
+    </div>
+    <div id="pie_chart"></div>
+    <div id="heatmap"></div>
+    <div id="my_dataviz"></div>
     <script src="js/elo_match.js"></script>
     <script src="js/pie_chart.js"></script>
     <script src="js/heatmap.js"></script>

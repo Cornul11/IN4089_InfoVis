@@ -23,8 +23,17 @@ except OSError:
 
 @app.route("/api/v1/match_elos", methods=["GET"])
 def match_elo():
+    civilization = request.args.get("civ")
+    map = request.args.get("map")
     # TODO: figure out if we use the jsonify or flask-cors
-    response = jsonify(elo_match_distribution())
+    if civilization and map:
+        response = jsonify(elo_match_distribution(civ=civilization, map=map))
+    elif civilization:
+        response = jsonify(elo_match_distribution(civ=civilization))
+    elif map:
+        response = jsonify(elo_match_distribution(map=map))
+    else:
+        response = jsonify(elo_match_distribution())
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 

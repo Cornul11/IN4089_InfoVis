@@ -75,19 +75,44 @@ async function drawChart() {
     })
 }
 
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
+function create_url() {
+    const base_url = "http://localhost:5000/api/v1/match_elos";
+    let url_suffix = "";
+    if (civ !== "none" && map !== "none") {
+        url_suffix = `?map=${map}&civ=${civ}`
+    } else if (civ !== "none") {
+        url_suffix = `?civ=${civ}`
+    } else if (map !== "none") {
+        url_suffix = `?map=${map}`
+    }
+    return base_url + url_suffix
+}
+
+let civ = "none";
+let map = "none";
+
 // updates the civilization image based on the dropdown menu selection
 $("#civ-names").change(function () {
     $("#civ-img").attr("src", "static/img/civ/" + $(this).val() + ".png");
-    match.something($(this).val());
-    $("#civ-card-text").text($("#civ-names option:selected").text())
+    // needed because in the database, civilizations start with uppercase letters, while in the HTML code,
+    // the values start with lowercase letters, and the images do so too
+    civ = capitalizeFirstLetter($(this).val());
+    match.redraw_histogram(create_url());
+    $("#civ-card-text").text($("#civ-names option:selected").text());
 });
+
 //updates the image of the map based on the dropdown menu selection
 $("#map-names").change(function () {
     $("#map-img").attr("src", "static/img/map/" + $(this).val() + ".png");
-    match.something($(this).val());
-    $("#map-card-text").text($("#map-names option:selected").text())
+    map = $(this).val()
+    match.redraw_histogram(create_url());
+    $("#map-card-text").text($("#map-names option:selected").text());
 });
-
 
 let match = new EloMatch(updateAllCharts)
 let pie_chart = new PieChart()

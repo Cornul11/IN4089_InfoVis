@@ -1,0 +1,17 @@
+#eloSpinner {
+    position: absolute;
+    display: none;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+}
+
+#eloPerMatch {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#pie_chart, #heatmap, #my_dataviz {
+    display: inline
+}
