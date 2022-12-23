@@ -83,9 +83,9 @@ function capitalizeFirstLetter(str) {
 function create_url() {
     const base_url = "http://localhost:5000/api/v1/match_elos";
     let url_suffix = "";
-    if (civ !== "none" && map !== "none") {
+    if (civ !== "None" && map !== "none") {
         url_suffix = `?map=${map}&civ=${civ}`
-    } else if (civ !== "none") {
+    } else if (civ !== "None") {
         url_suffix = `?civ=${civ}`
     } else if (map !== "none") {
         url_suffix = `?map=${map}`
