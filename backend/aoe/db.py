@@ -2,7 +2,7 @@ import sqlite3
 
 from flask import g
 
-DATABASE = 'aoe.sqlite'
+DATABASE = "aoe.sqlite"
 
 
 def init_db_app(app):
@@ -10,14 +10,14 @@ def init_db_app(app):
 
 
 def get_db():
-    db = getattr(g, '_database', None)
+    db = getattr(g, "_database", None)
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
     return db
 
 
 def close_connection(exception):
-    db = getattr(g, '_database', None)
+    db = getattr(g, "_database", None)
     if db is not None:
         db.close()
 

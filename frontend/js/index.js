@@ -7,9 +7,24 @@ async function updateAllCharts(elo_start, elo_end) {
 async function updatePieChart(elo_start, elo_end) {
     // api call goes here
     let api_call = "http://localhost:5000/api/v1/game_type_stats";
+
+    let params = {};
     if (elo_start != null && elo_end != null) {
-        api_call += `?elo_s=${elo_start}&elo_e=${elo_end}`;
+        params["elo_s"] = elo_start;
+        params["elo_e"] = elo_end;
     }
+    if (civ.toLowerCase() !== "none") {
+        params["civ"] = capitalizeFirstLetter(civ.toLowerCase());
+    }
+    if (map.toLowerCase() !== "none") {
+        params["map"] = map.toLowerCase();
+    }
+
+    // Append the query parameters to the API call url
+    if (Object.keys(params).length > 0) {
+        api_call += "?" + new URLSearchParams(params).toString();
+    }
+
     d3.json(api_call).then(data => {
         pie_chart.updateChart(data)
     });
@@ -80,37 +95,52 @@ function capitalizeFirstLetter(str) {
 }
 
 
-function create_url() {
+function create_histogram_url() {
+    // Set the base API call url
     const base_url = "http://localhost:5000/api/v1/match_elos";
-    let url_suffix = "";
-    if (civ.toLowerCase() !== "none" && map.toLowerCase() !== "none") {
-        url_suffix = `?map=${map}&civ=${civ}`
-    } else if (civ.toLowerCase() !== "none") {
-        url_suffix = `?civ=${civ}`
-    } else if (map.toLowerCase() !== "none") {
-        url_suffix = `?map=${map}`
+
+    // Set the query parameters based on the provided input
+    let params = {};
+    if (civ.toLowerCase() !== "none") {
+        params["civ"] = civ;
     }
-    return base_url + url_suffix
+    if (map.toLowerCase() !== "none") {
+        params["map"] = map;
+    }
+
+    // Append the query parameters to the API call url
+    let url = base_url;
+    if (Object.keys(params).length > 0) {
+        url += "?" + new URLSearchParams(params).toString();
+    }
+
+    return url;
 }
 
 let civ = "none";
 let map = "none";
 
-// updates the civilization image based on the dropdown menu selection
+// Update the civilization image and redraw the histogram when the dropdown menu selection changes
 $("#civ-names").change(function () {
-    $("#civ-img").attr("src", "static/img/civ/" + $(this).val() + ".png");
-    // needed because in the database, civilizations start with uppercase letters, while in the HTML code,
-    // the values start with lowercase letters, and the images do so too
-    civ = capitalizeFirstLetter($(this).val());
-    match.redraw_histogram(create_url());
+    // Update the image source and the global `civ` variable
+    const civ_val = $(this).val();
+    $("#civ-img").attr("src", `static/img/civ/${civ_val}.png`);
+    civ = capitalizeFirstLetter(civ_val);
+
+    // Redraw the histogram and update the card text
+    match.redraw_histogram(create_histogram_url());
     $("#civ-card-text").text($("#civ-names option:selected").text());
 });
 
-//updates the image of the map based on the dropdown menu selection
+// Update the map image and redraw the histogram when the dropdown menu selection changes
 $("#map-names").change(function () {
-    $("#map-img").attr("src", "static/img/map/" + $(this).val() + ".png");
-    map = $(this).val()
-    match.redraw_histogram(create_url());
+    // Update the image source and the global `map` variable
+    const map_val = $(this).val();
+    $("#map-img").attr("src", `static/img/map/${map_val}.png`);
+    map = map_val;
+
+    // Redraw the histogram and update the card text
+    match.redraw_histogram(create_histogram_url());
     $("#map-card-text").text($("#map-names option:selected").text());
 });
 

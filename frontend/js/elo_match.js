@@ -1,5 +1,5 @@
 class EloMatch {
-    draw_histogram(url, svg, margin, width, height) {
+    draw_histogram(url, svg, margin, width, height, updateAllCharts) {
         svg.selectAll("*").remove();
         d3.select('#eloPerMatch').dispatch('dataLoading');
         d3.json(url).then(data => {
@@ -105,23 +105,24 @@ class EloMatch {
         .attr("transform",
             `translate(${this.margin.left},${this.margin.top})`);
 
-    constructor() {
-
+    constructor(updateAllCharts) {
+        this.updateAllCharts = updateAllCharts;
         d3.select('#eloPerMatch')
-            .on('dataLoading', function () {
+            .on('dataLoading', () => {
                 d3.select('#eloSpinner').style('display', 'block');
                 d3.select('#map-names').attr('disabled', true)
                 d3.select('#civ-names').attr('disabled', true)
             })
-            .on('dataLoaded', function () {
+            .on('dataLoaded', () => {
                 d3.select('#eloSpinner').style('display', 'none');
                 d3.select('#map-names').attr('disabled', null)
                 d3.select('#civ-names').attr('disabled', null)
             });
-        this.draw_histogram("http://localhost:5000/api/v1/match_elos", this.svg, this.margin, this.width, this.height)
+        this.draw_histogram("http://localhost:5000/api/v1/match_elos", this.svg, this.margin, this.width, this.height, updateAllCharts)
     }
 
     redraw_histogram(url) {
-        this.draw_histogram(url, this.svg, this.margin, this.width, this.height)
+        this.draw_histogram(url, this.svg, this.margin, this.width, this.height, this.updateAllCharts);
+        this.updateAllCharts(null, null);
     }
 }

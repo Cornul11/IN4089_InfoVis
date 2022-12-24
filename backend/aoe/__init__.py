@@ -2,12 +2,7 @@ import os
 
 from flask import Flask, request, jsonify, make_response
 
-from aoe.data_extraction import (
-    elo_match_distribution,
-    global_civ_stats,
-    game_type,
-    heatmap_data,
-)
+from aoe.data_extraction import elo_match_distribution, game_type, heatmap_data
 from aoe.db import init_db_app
 
 app = Flask(__name__)
@@ -23,17 +18,13 @@ except OSError:
 
 @app.route("/api/v1/match_elos", methods=["GET"])
 def match_elo():
-    civilization = request.args.get("civ")
-    map = request.args.get("map")
-    # TODO: figure out if we use the jsonify or flask-cors
-    if civilization and map:
-        response = jsonify(elo_match_distribution(civ=civilization, map=map))
-    elif civilization:
-        response = jsonify(elo_match_distribution(civ=civilization))
-    elif map:
-        response = jsonify(elo_match_distribution(map=map))
-    else:
-        response = jsonify(elo_match_distribution())
+    # Get the request parameters
+    params = {"civ": request.args.get("civ"), "map": request.args.get("map")}
+
+    # Call the elo_match_distribution function with the provided parameters
+    response = jsonify(elo_match_distribution(**params))
+
+    # Add the CORS header to the response
     response.headers.add("Access-Control-Allow-Origin", "*")
     return response
 
@@ -52,13 +43,13 @@ def match_elo():
 @app.route("/api/v1/game_type_stats", methods=["GET"])
 def game_types_stats():
     if request.method == "GET":
-        elo_start = request.args.get("elo_s")
-        elo_end = request.args.get("elo_e")
-        if not elo_start or not elo_end:
-            response = jsonify(game_type())
-        else:
-            pass
-            response = jsonify(game_type(int(elo_start), int(elo_end)))
+        params = {
+            "map": request.args.get("map"),
+            "civ": request.args.get("civ"),
+            "elo_s": request.args.get("elo_s"),
+            "elo_e": request.args.get("elo_e"),
+        }
+        response = jsonify(game_type(**params))
         response.headers.add("Access-Control-Allow-Origin", "*")
         return response
 

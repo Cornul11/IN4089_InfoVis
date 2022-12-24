@@ -5,63 +5,53 @@ from aoe.db import query_db
 
 def elo_match_distribution(map=None, civ=None):
     """
-    Returns a list of dictionaries containing the frequency and range of ELO ratings for each bin
-     in a histogram of ELO ratings for all matches.
+    This function returns the distribution of matches based on the average rating of players in those matches. The
+     distribution is returned as a list of dictionaries, where each dictionary contains the following keys:
+        - frequency: the number of matches that fall within a certain rating range
+        - range: the rating range for the frequency count
 
-    :return: A list of dictionaries with keys 'frequency' and 'range', representing the frequency
-     and range of ELO ratings for each bin, respectively.
+    The function can also filter the distribution based on the map and/or civilization played in the match.
+
+    Args:
+        map (str, optional): The map played in the matches. If provided, the distribution will only include matches
+        played on this map.
+        civ (str, optional): The civilization played in the matches. If provided, the distribution will only include
+        matches where players used this civilization.
+
+    Returns:
+        list: A list of dictionaries containing the frequency and range for each rating bin.
     """
-    if map and civ:
-        query_str = "SELECT FLOOR(matches.average_rating / 100) * 100 AS rating_range, \
-                            COUNT(*)                                  AS frequency \
-                     FROM matches \
-                              INNER JOIN players ON matches.token = players.match \
-                     WHERE players.civ = ? \
-                       AND matches.map = ? \
-                     GROUP BY rating_range \
-                     ORDER BY rating_range ASC;"
-        query_args = [civ, map]
-    elif civ:
-        query_str = "SELECT FLOOR(matches.average_rating / 100) * 100 AS rating_range, \
-                            COUNT(*)                                  AS frequency \
-                     FROM matches \
-                              INNER JOIN players ON matches.token = players.match \
-                     WHERE players.civ = ? \
-                     GROUP BY rating_range \
-                     ORDER BY rating_range ASC;"
-        query_args = [civ]
-    elif map:
-        query_str = "SELECT FLOOR(average_rating / 100.00) * 100 AS bin_floor, \
-                            COUNT(`index`)                       AS count \
-                     FROM matches \
-                     WHERE map IS ? \
-                     GROUP BY 1 \
-                     ORDER BY 1;"
-        query_args = [map]
-    else:
-        query_str = "SELECT FLOOR(average_rating / 100.00) * 100 AS bin_floor, \
-                            COUNT(`index`)                       AS count \
-                     FROM matches \
-                     GROUP BY 1 \
-                     ORDER BY 1;"
-        query_args = []
+    # Set the query string and arguments based on the provided parameters
+    query_str = "SELECT FLOOR(matches.average_rating / 100) * 100 AS rating_range, COUNT(*) AS frequency"
+    query_str += " FROM matches"
+    query_args = []
+    where_clauses = []
+    if map:
+        where_clauses.append("matches.map = ?")
+        query_args.append(map)
+    if civ:
+        query_str += " INNER JOIN players ON matches.token = players.match"
+        where_clauses.append("players.civ = ?")
+        query_args.append(civ)
+    if where_clauses:
+        query_str += f" WHERE {' AND '.join(where_clauses)}"
+    query_str += " GROUP BY rating_range ORDER BY rating_range ASC"
 
+    # Execute the query and return the results as a list of dictionaries
     rows = query_db(query_str, query_args)
-
-    results = [{"frequency": x[1], "range": x[0]} for x in rows]
-    return results
+    return [{"frequency": x[1], "range": x[0]} for x in rows]
 
 
 def global_civ_stats(players_m: pd.DataFrame, elo_s: int, elo_e: int) -> dict:
     """
     {Inca: {
-            win_rate: 11
-            popularity: 100
+        win_rate: 11
+        popularity: 100
 
-            },
-     Aztec: {
+    },
+        Aztec: {
             ...
-            }
+        }
     }
     """
     # remove entries from df that aren't in the elo interval
@@ -80,21 +70,39 @@ def global_civ_stats(players_m: pd.DataFrame, elo_s: int, elo_e: int) -> dict:
     return res_dict
 
 
-def game_type(elo_s=0, elo_e=4000) -> dict:
+def game_type(map=None, civ=None, elo_s=0, elo_e=4000) -> dict:
     """
-    Returns a dictionary containing the frequencies of different game types (ladders) within a certain ELO range.
+    Retrieve the frequency of games played for a given map and/or civilization, within a given ELO range.
 
-    :param elo_s: The lower bound of the ELO range (inclusive). Default is 0.
-    :param elo_e: The upper bound of the ELO range (inclusive). Default is 4000.
-    :return: A dictionary with ladders as keys and frequencies as values.
+    Parameters:
+    - map (str): The map for which to retrieve game frequencies. If not provided, frequencies will be returned for all maps.
+    - civ (str): The civilization for which to retrieve game frequencies. If not provided, frequencies will be returned for all civilizations.
+    - elo_s (int): The lower bound of the ELO range for which to retrieve game frequencies. Default is 0.
+    - elo_e (int): The upper bound of the ELO range for which to retrieve game frequencies. Default is 4000.
+
+    Returns:
+    - dict: A dictionary containing the frequencies of games played for the given parameters. The dictionary keys are the ladders, and the values are the frequencies.
     """
-    rows = query_db(
-        "select ladder, count(*) as frequency \
-        from matches \
-        where average_rating between ? and ?\
-        group by ladder;",
-        [elo_s, elo_e],
-    )
+    # Set the query string and arguments based on the provided parameters
+    query_str = "SELECT m.ladder, count(*) AS frequency FROM matches m"
+    query_args = []
+    where_clauses = []
+    if map:
+        where_clauses.append("m.map = ?")
+        query_args.append(map)
+    if civ:
+        query_str += " JOIN players p ON m.token = p.match"
+        where_clauses.append("p.civ = ?")
+        query_args.append(civ)
+    if elo_s or elo_e:
+        where_clauses.append("m.average_rating BETWEEN ? AND ?")
+        query_args += [elo_s, elo_e]
+    if where_clauses:
+        query_str += f" WHERE {' AND '.join(where_clauses)}"
+    query_str += " GROUP BY m.ladder"
+
+    # Execute the query and return the results as a dictionary
+    rows = query_db(query_str, query_args)
     return dict(rows)
 
 
