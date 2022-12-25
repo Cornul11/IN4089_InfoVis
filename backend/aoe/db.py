@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 
 from flask import g
 
@@ -27,3 +28,9 @@ def query_db(query, args=(), one=False):
     rv = cur.fetchall()
     cur.close()
     return (rv[0] if rv else None) if one else rv
+
+def df_from_query(query):
+    con = getattr(g, "_database", None)
+    df = pd.read_sql_query(query, con)
+    return df
+

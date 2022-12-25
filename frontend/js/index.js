@@ -146,6 +146,7 @@ $("#map-names").change(function () {
 
 let match = new EloMatch(updateAllCharts)
 let pie_chart = new PieChart()
-let heatmap = new Heatmap()
+// let heatmap = new Heatmap()
+let winrate = new WinRatePatch()
 //pieChart()
 drawChart();

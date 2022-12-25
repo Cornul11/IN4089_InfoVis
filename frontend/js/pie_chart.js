@@ -4,6 +4,8 @@ class PieChart {
         this.width = 500
         this.height = 500
         this.margin = 40
+        this.selectedTeams = false;
+        this.selected1v1 = false;
 
         // The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
         this.radius = Math.min(this.width, this.height) / 2 - this.margin;
@@ -26,7 +28,11 @@ class PieChart {
             .value(function (d) {
                 return d[1];  // Amount of games in type
             })
-            .sort(d3.ascending)
+
+        const arcGenerator = d3.arc()
+            .innerRadius(0)
+            .outerRadius(this.radius);
+        const arcOver = d3.arc().innerRadius(0).outerRadius(this.radius + 10);
 
         const data_ready = pie(Object.entries(data))
         let total = 0;
@@ -39,9 +45,9 @@ class PieChart {
             .data(data_ready)
             // Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
             .join('path')
-            .attr('d', d3.arc()
-                .innerRadius(0)  // This makes the donut hole, 0 is a pie chart
-                .outerRadius(this.radius)
+            .attr('d', function(d) {
+                    return arcGenerator(d);
+                }
             )
             .attr('fill', function (d) {  // Hardcoded colors
                 if (d.data[0] === "RM_1v1") {
@@ -50,13 +56,65 @@ class PieChart {
                     return "#ea541c"
                 }
             })
+            .on("click", function(d, i)
+            {
+                if (i.data[0] === "RM_1v1")
+                {
+                    if(this.selected1v1)
+                    {
+                        this.selected1v1 = false;
+                        d3.select(this)
+                            .transition()
+                            .duration(1000)
+                            .attr("d", arcGenerator)
+                    } else {
+                        this.selected1v1 = true;
+                        d3.select(this)
+                            .attr("stroke", "white")
+                            .transition()
+                            .duration(1000)
+                            .attr("d", arcOver)
+                            .attr("stroke-width", "6px");
+                    }
+                    console.log("1v1 filtering goes here");
+                }
+
+                if (i.data[0] === "RM_TEAM")
+                {
+                    if(this.selectedTeams)
+                    {
+                        this.selectedTeams = false;
+                        d3.select(this)
+                            .transition()
+                            .duration(1000)
+                            .attr("d", arcGenerator)
+                    } else {
+                        this.selectedTeams = true;
+                        d3.select(this)
+                            .attr("stroke", "white")
+                            .transition()
+                            .duration(1000)
+                            .attr("d", arcOver)
+                            .attr("stroke-width", "6px");
+                    }
+                    console.log("team filtering goes here");
+                }
+            })
+            .on("mouseenter", function(d, i){
+                console.log(i.data[0])
+                d3.select(this).transition()
+                    .duration('50')
+                    .attr('opacity', '.85');
+            })
+            .on("mouseleave", function(d){
+                // d3.select(this)
+                //     .transition()
+                //     .duration(1000)
+                //     .attr("d", arcGenerator)
+            })
             .attr("stroke", "white")
             .style("stroke-width", "2px")
             .style("opacity", 1)
-
-        const arcGenerator = d3.arc()
-            .innerRadius(0)
-            .outerRadius(this.radius)
 
         d3.select('#pie_chart').selectAll('text').remove()  // Clear the old text
         this.svg.selectAll('mySlices')
