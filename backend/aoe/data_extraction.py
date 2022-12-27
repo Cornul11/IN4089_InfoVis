@@ -164,18 +164,20 @@ def heatmap_data(elo_s: int = None, elo_e: int = None):
 
 
 def winrate_data(elo_s: int = None, elo_e: int = None, civ: str = None):
-    csv = "patch,value"
+    csv = "patch,amount"
 
-    tokens = query_db("SELECT token FROM players WHERE winner is True AND civ=?;", (civ, ))
-    tokens = [i[0] for i in tokens]
+    wins = df_from_query(f"SELECT match FROM players WHERE winner is True AND civ=\"{civ}\";")
 
     patches = [35584, 36202, 36906, 37650, 37906, 39284, 39515, 40220, 40874, 41855, 42848, 43210]
     for patch in patches:
         if elo_s is not None and elo_e is not None:
-            df = df_from_query(
-                f"SELECT token, patch FROM matches WHERE patch={patch} AND average_rating BETWEEN {elo_s} AND {elo_e}")
+            matches = df_from_query(
+                f"SELECT token FROM matches WHERE patch={patch} AND average_rating BETWEEN {elo_s} AND {elo_e}")
         else:
-            df = df_from_query(f"SELECT token, patch FROM matches WHERE patch={patch}")
+            matches = df_from_query(f"SELECT token FROM matches WHERE patch={patch}")
 
-        # TODO: this is not working for some reason, I'll pick up from here
-        df = df[df['token'].isin(tokens)]
+        matches = matches.token.unique()
+        amount = wins[wins['match'].isin(matches)].shape[0]
+        csv += '\n' + str(patch) + ',' + str(amount)
+
+    return csv

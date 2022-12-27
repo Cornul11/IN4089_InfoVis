@@ -30,7 +30,7 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 def df_from_query(query):
-    con = getattr(g, "_database", None)
+    con = get_db()
     df = pd.read_sql_query(query, con)
     return df
 
