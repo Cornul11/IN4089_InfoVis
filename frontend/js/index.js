@@ -1,6 +1,7 @@
 // TODO: some of the logic is the same in every plot, it might be simplified later to reduce code
 async function updateAllCharts(elo_start, elo_end) {
     updatePieChart(elo_start, elo_end)
+    updateWinRate(elo_start, elo_end)
     updateHeatmap(elo_start, elo_end)
 }
 
@@ -27,6 +28,32 @@ async function updatePieChart(elo_start, elo_end) {
 
     d3.json(api_call).then(data => {
         pie_chart.updateChart(data)
+    });
+}
+
+async function updateWinRate(elo_start, elo_end) {
+    // api call goes here
+    let api_call = "http://localhost:5000/api/v1/winrate_civ";
+
+    let params = {};
+    if (elo_start != null && elo_end != null) {
+        params["elo_s"] = elo_start;
+        params["elo_e"] = elo_end;
+    }
+    if (civ.toLowerCase() !== "none") {
+        params["civ"] = capitalizeFirstLetter(civ.toLowerCase());
+    } else {
+        params["civ"] = "Aztecs"  // TODO: temporary solution
+    }
+    console.log(params["civ"])
+
+    // Append the query parameters to the API call url
+    if (Object.keys(params).length > 0) {
+        api_call += "?" + new URLSearchParams(params).toString();
+    }
+
+    d3.csv(api_call).then(data => {
+        winrate.updateChart(data)
     });
 }
 
