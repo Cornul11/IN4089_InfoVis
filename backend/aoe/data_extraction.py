@@ -176,8 +176,12 @@ def winrate_data(elo_s: int = None, elo_e: int = None, civ: str = None):
         else:
             matches = df_from_query(f"SELECT token FROM matches WHERE patch={patch}")
 
+        if matches.shape[0] == 0:
+            continue
         matches = matches.token.unique()
         amount = wins[wins['match'].isin(matches)].shape[0]
+        if amount == 0:
+            continue
         csv += '\n' + str(patch) + ',' + str(amount)
 
     return csv

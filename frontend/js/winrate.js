@@ -21,10 +21,11 @@ class WinRatePatch {
             }).then(
             // Now I can use this dataset:
             function (data) {
+                const patches = data.map(function (d) {return parseInt(d.patch)})
                 // Add X axis
-                const x = d3.scaleBand()
+                const x = d3.scalePoint()
                     .range([0, width])
-                    .domain([35584, 36202, 36906, 37650, 37906, 39284, 39515, 40220, 40874, 41855, 42848, 43210]);
+                    .domain(patches)
 
                 svg.append("g")
                     .attr("transform", "translate(0," + height + ")")
