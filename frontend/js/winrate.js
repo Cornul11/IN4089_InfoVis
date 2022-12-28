@@ -21,6 +21,7 @@ class WinRatePatch {
             }).then(
             // Now I can use this dataset:
             function (data) {
+                console.log(data)  // TODO: remove
                 const patches = data.map(function (d) {return parseInt(d.patch)})
                 // Add X axis
                 const x = d3.scalePoint()
@@ -32,7 +33,7 @@ class WinRatePatch {
                     .call(d3.axisBottom(x));
                 // Add Y axis
                 const y = d3.scaleLinear()
-                    .domain([0, d3.max(data, d => d.amount)])
+                    .domain([0, d3.max(data, d => parseInt(d.amount))])
                     .range([height, 0]);
                 svg.append("g")
                     .call(d3.axisLeft(y));
